@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BurnWise
 
-## Getting Started
+ระบบจัดการการเผาในภาคเกษตร · พื้นที่ต้นแบบ อำเภอปาย จังหวัดแม่ฮ่องสอน
+(Next.js App Router + TypeScript, ภาษาไทยเป็นหลัก, Light/Dark, responsive)
 
-First, run the development server:
-
+## วิธีรัน
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # ไม่บังคับ — ใส่คีย์เฉพาะบริการที่ต้องการ
+npm run dev                  # http://localhost:3000
+npm run build && npm start   # production
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ฟีเจอร์ที่ทำแล้ว
+- เมนูไอคอน 6 รายการ (tooltip + aria-label + aria-current): แดชบอร์ด, แผนที่, ยื่นคำขอเผา, ประเมินความเหมาะสม, การแจ้งเตือน, โปรไฟล์ และหน้า `/report` (รายงานเหตุไฟ) ที่เข้าจากปุ่มในแดชบอร์ด/แผนที่
+- แดชบอร์ด: อุณหภูมิ ลม (ความเร็ว/ทิศ) ความชื้น ความกดอากาศ PM2.5 จุดความร้อน พร้อมหน่วย แหล่งข้อมูล ประเภท เวลา และป้าย "ข้อมูลเก่า"
+- แผนที่ (Leaflet + OpenStreetMap): ขอบเขตอำเภอปาย ลูกศรลม จุดความร้อน (เมื่อตั้งค่า FIRMS)
+- ฟอร์มรายงานเหตุไฟ / คำขอเผา: เลือกตำแหน่ง ภาพประกอบทิศทางลมที่เวลาที่เลือก — **ไม่ส่งและไม่บันทึกจริง** และแจ้งชัดเจนในหน้า
+- ประเมินการเผา: แสดงข้อมูลประกอบเท่านั้น ไม่ตัดสินและไม่กำหนดไร่สูงสุด เกณฑ์แสดง "ยังไม่มีเกณฑ์ที่ยืนยัน" (เพิ่มเกณฑ์ทางการที่ `src/lib/assessmentCriteria.ts`)
+- การแจ้งเตือน/โปรไฟล์: เก็บใน localStorage ของเบราว์เซอร์เท่านั้น ระบุว่ายังไม่มี Push/SMS/ระบบสมาชิก
+- สถานะ loading / empty / error / ข้อมูลเก่า ครบทุกส่วนที่ดึงข้อมูล
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## แหล่งข้อมูล (ทุกค่าติดป้ายประเภท)
+| ข้อมูล | แหล่ง | ประเภท | สถานะ |
+|---|---|---|---|
+| ลม อุณหภูมิ ความชื้น ความกดอากาศ | Open-Meteo Forecast | แบบจำลอง | ใช้งานได้ ไม่ต้องใช้คีย์ |
+| PM2.5 | Open-Meteo Air Quality (CAMS) | แบบจำลอง | ใช้งานได้ ไม่ต้องใช้คีย์ |
+| ขอบเขตอำเภอ | OpenStreetMap Nominatim | ข้อมูลแผนที่ | ใช้งานได้ (cache 1 วัน) |
+| จุดความร้อน | NASA FIRMS VIIRS | ดาวเทียม | ต้องตั้ง `FIRMS_MAP_KEY` |
+| สถานีตรวจวัดจริง | `STATION_API_URL` | ตรวจวัดจริง | ต้องตั้งค่า + ปรับ adapter |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+คีย์อ่านเฉพาะฝั่งเซิร์ฟเวอร์ (`src/app/api/*`, `src/lib/sources/*` ใช้ `server-only`) ไม่มีตัวแปร `NEXT_PUBLIC_`
 
-## Learn More
+## บริการภายนอกที่ยังต้องตั้งค่า / ยังไม่มี
+- `FIRMS_MAP_KEY` (NASA FIRMS, ฟรี), `STATION_API_URL`/`STATION_API_TOKEN` (รูปแบบ JSON ที่คาดหวังอยู่ใน `src/lib/sources/stations.ts`)
+- Backend + ฐานข้อมูลสำหรับรับรายงานเหตุและคำขอเผา, ระบบสมาชิก/เข้าสู่ระบบ, ระบบส่ง Push/SMS
+- ทะเบียนแปลงเกษตร และเกณฑ์การเผาที่หน่วยงานรับรอง
+- โลโก้จริง: แทนที่ `public/logo.svg` (ปัจจุบันเป็น placeholder)
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+ระบบนี้ไม่ยืนยันว่าคำขอได้รับการบันทึกหรืออนุมัติ และไม่ระบุว่าพื้นที่ปลอดภัยต่อการเผา

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- PLACEHOLDER logo: replace this file with the real BurnWise logo -->
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="#C2410C"/>
+  <path d="M32 12c2 8 10 12 10 22a10 10 0 0 1-20 0c0-5 3-8 5-11 1 3 2 4 4 5-1-6 0-11 1-16z" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+</svg>
