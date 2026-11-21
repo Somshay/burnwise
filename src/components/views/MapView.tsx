@@ -1,7 +1,5 @@
 "use client";
-import Link from "next/link";
 import { useState } from "react";
-import { Flame } from "lucide-react";
 import PaiMapLazy from "@/components/map/PaiMapLazy";
 import { EmptyState, ErrorState } from "@/components/states/states";
 import { useApi } from "@/lib/useApi";
@@ -53,9 +51,7 @@ export default function MapView() {
         {hs?.status === "error" && <ErrorState title="โหลดจุดความร้อนไม่สำเร็จ" />}
         {hs?.status === "ok" && hs.data?.hotspots.length === 0 && <EmptyState title="ไม่พบจุดความร้อนในข้อมูลล่าสุด">{hs.data.windowNote}</EmptyState>}
         {(weather.networkError || weather.result?.status === "error") && <ErrorState title="โหลดข้อมูลลมไม่สำเร็จ" />}
-        <EmptyState title="จุดรายงานเหตุ: ยังไม่มี">ยังไม่มีระบบหลังบ้านรับรายงาน จึงไม่มีจุดรายงานเหตุบนแผนที่ รายงานที่กรอกในหน้ารายงานเหตุไฟไม่ถูกส่งหรือบันทึก</EmptyState>
-        <div><Link className="btn primary" href="/report"><Flame size={18} strokeWidth={1.75} aria-hidden="true" />รายงานเหตุไฟ</Link></div>
-      </div>
+              </div>
     </>
   );
 }

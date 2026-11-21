@@ -64,3 +64,13 @@ export type FarmlandData = {
   count: number;
   truncated: boolean;
 };
+
+export type ZoneCondition = {
+  id: string;
+  time: string;
+  windSpeed: number; // km/h
+  windDirection: number; // degrees, wind comes FROM
+  humidity: number; // %
+  pressureMsl: number; // hPa, mean sea level
+  pm25: number | null; // µg/m³
+};

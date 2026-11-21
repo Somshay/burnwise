@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-// Secondary pages kept from the first version. They are not linked from the single-page home yet.
+// Secondary pages (alerts, profile, map, completed burns) share this container and back link.
 export default function LegacyLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="container">

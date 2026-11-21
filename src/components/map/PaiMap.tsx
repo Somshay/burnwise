@@ -4,7 +4,8 @@ import L from "leaflet";
 import { useEffect, useState } from "react";
 import { Circle, CircleMarker, GeoJSON, MapContainer, Marker, Polygon, Popup, TileLayer, ZoomControl, useMap, useMapEvents } from "react-leaflet";
 import { PAI_CENTER } from "@/lib/config";
-import { compassThai, formatThaiDateTime } from "@/lib/format";
+import { formatThaiDateTime } from "@/lib/format";
+import ZoneCluster, { type ZonePin } from "./ZoneCluster";
 import type { Hotspot } from "@/lib/types";
 
 export type MapProps = {
@@ -18,6 +19,9 @@ export type MapProps = {
   sector?: { origin: { lat: number; lon: number }; windFrom: number } | null;
   tall?: boolean;
   user?: { lat: number; lon: number; accuracy: number } | null;
+  zones?: ZonePin[];
+  onZoneSelect?: (id: string) => void;
+  focus?: { lat: number; lon: number; seq: number } | null;
   fill?: boolean; // fill the parent height (single-page hero map)
   farmland?: GeoJSON.GeoJsonObject;
   showFarmland?: boolean;
@@ -35,6 +39,15 @@ function FlyToUser({ user }: { user?: MapProps["user"] }) {
   useEffect(() => {
     if (lat !== undefined && lon !== undefined) map.flyTo([lat, lon], Math.max(map.getZoom(), 15), { duration: 1 });
   }, [map, lat, lon]);
+  return null;
+}
+
+function FlyToFocus({ focus }: { focus?: MapProps["focus"] }) {
+  const map = useMap();
+  const seq = focus?.seq, lat = focus?.lat, lon = focus?.lon;
+  useEffect(() => {
+    if (seq !== undefined && lat !== undefined && lon !== undefined) map.flyTo([lat, lon], 17, { duration: 1 });
+  }, [map, seq, lat, lon]);
   return null;
 }
 
@@ -95,9 +108,7 @@ export default function PaiMap(p: MapProps) {
           </CircleMarker>
         ))}
         {p.showWind !== false && p.wind && (
-          <Marker position={[PAI_CENTER.lat, PAI_CENTER.lon]} icon={windIcon(p.wind.direction)} keyboard={false}>
-            <Popup>ลมจากทิศ{compassThai(p.wind.direction)} ({Math.round(p.wind.direction)}°) ความเร็ว {p.wind.speed.toFixed(1)} กม./ชม.<br />แบบจำลอง Open-Meteo</Popup>
-          </Marker>
+          <Marker position={[PAI_CENTER.lat, PAI_CENTER.lon]} icon={windIcon(p.wind.direction)} keyboard={false} interactive={false} zIndexOffset={-1000} />
         )}
         {p.sector && <Polygon positions={downwindPolygon(p.sector.origin, p.sector.windFrom)} pathOptions={{ color: "#1864ab", weight: 2, dashArray: "6 4", fillOpacity: 0.2 }} />}
         {p.picked && <CircleMarker center={[p.picked.lat, p.picked.lon]} radius={9} pathOptions={{ color: "#fff", weight: 3, fillColor: "#1864ab", fillOpacity: 1 }} />}
@@ -109,7 +120,9 @@ export default function PaiMap(p: MapProps) {
             </CircleMarker>
           </>
         )}
+        {p.zones && <ZoneCluster zones={p.zones} onSelect={p.onZoneSelect} />}
         <FlyToUser user={p.user} />
+        <FlyToFocus focus={p.focus} />
         <ClickHandler onPick={p.onPick} />
       </MapContainer>}
     </div>

@@ -4,11 +4,11 @@ import type { AirData, WeatherData } from "../types";
 
 // Open-Meteo returns local times without offset when a timezone is requested.
 // Asia/Bangkok is a fixed UTC+7 with no DST.
-function toIso(local: string): string {
+export function toIso(local: string): string {
   return /[zZ]|[+-]\d\d:\d\d$/.test(local) ? local : `${local}:00+07:00`;
 }
 
-async function getJson(url: string): Promise<Record<string, unknown>> {
+export async function getJson(url: string): Promise<Record<string, unknown>> {
   const res = await fetch(url, {
     headers: { "User-Agent": USER_AGENT },
     signal: AbortSignal.timeout(10_000),
@@ -18,10 +18,10 @@ async function getJson(url: string): Promise<Record<string, unknown>> {
   return (await res.json()) as Record<string, unknown>;
 }
 
-export async function fetchWeather(): Promise<WeatherData> {
+export async function fetchWeather(lat: number = PAI_CENTER.lat, lon: number = PAI_CENTER.lon): Promise<WeatherData> {
   const q = new URLSearchParams({
-    latitude: String(PAI_CENTER.lat),
-    longitude: String(PAI_CENTER.lon),
+    latitude: String(lat),
+    longitude: String(lon),
     current: "temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m",
     hourly: "wind_speed_10m,wind_direction_10m",
     wind_speed_unit: "kmh",
@@ -52,10 +52,10 @@ export async function fetchWeather(): Promise<WeatherData> {
   };
 }
 
-export async function fetchAir(): Promise<AirData> {
+export async function fetchAir(lat: number = PAI_CENTER.lat, lon: number = PAI_CENTER.lon): Promise<AirData> {
   const q = new URLSearchParams({
-    latitude: String(PAI_CENTER.lat),
-    longitude: String(PAI_CENTER.lon),
+    latitude: String(lat),
+    longitude: String(lon),
     current: "pm2_5",
     timezone: TIMEZONE,
   });

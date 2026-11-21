@@ -23,9 +23,11 @@ export function useLocalStore<T extends object>(key: string, initial: T) {
     try { return { ...initial, ...(JSON.parse(raw) as T) }; } catch { return initial; }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [raw]);
-  const set = useCallback((next: T) => {
-    try { localStorage.setItem(key, JSON.stringify(next)); } catch { /* storage unavailable */ }
+  /** Returns false when the browser refused the write (storage full or unavailable). */
+  const set = useCallback((next: T): boolean => {
+    try { localStorage.setItem(key, JSON.stringify(next)); } catch { return false; }
     window.dispatchEvent(new Event(EVENT));
+    return true;
   }, [key]);
   return [value, set] as const;
 }

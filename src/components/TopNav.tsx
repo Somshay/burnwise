@@ -1,14 +1,13 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, ClipboardCheck, FilePlus2, LayoutDashboard, Map, UserRound } from "lucide-react";
+import { Bell, ClipboardCheck, LayoutDashboard, Map, UserRound } from "lucide-react";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 
 const ITEMS = [
   { href: "/", label: "แดชบอร์ด", Icon: LayoutDashboard },
   { href: "/map", label: "แผนที่", Icon: Map },
-  { href: "/burn-request", label: "ยื่นคำขอเผา", Icon: FilePlus2 },
   { href: "/assessment", label: "ประเมินความเหมาะสมในการเผา", Icon: ClipboardCheck },
   { href: "/alerts", label: "การแจ้งเตือน", Icon: Bell },
   { href: "/profile", label: "โปรไฟล์", Icon: UserRound },
