@@ -44,7 +44,7 @@
 }
 
 * { box-sizing: border-box; }
-html { color-scheme: light dark; }
+html { color-scheme: light dark; font-size: 112.5%; }
 :root[data-theme="light"] { color-scheme: light; }
 :root[data-theme="dark"] { color-scheme: dark; }
 body {
@@ -234,3 +234,31 @@ th { color: var(--ink-soft); font-weight: 600; font-size: 0.9rem; }
 .done-dl dt { color: var(--ink-soft); }
 .done-dl dd { margin: 0; }
 .done-photo { display: block; width: 100%; max-width: 360px; border-radius: 12px; margin-top: 6px; }
+
+/* larger, calmer layout for older users */
+.hero-info { font-size: 1rem; padding: 10px 14px; }
+.hero-info .fine, .fine { font-size: 0.8rem; color: var(--ink-soft); }
+.counts { display: flex; flex-wrap: wrap; gap: 4px 14px; font-weight: 600; }
+.dot { width: 14px; height: 14px; border-radius: 4px; }
+.zone-pin span { width: 30px; height: 30px; font-size: 17px; margin: 0; border-radius: 9px; }
+.compact .metric-value { font-size: 1.8rem; }
+.compact .metric-head { font-size: 1rem; }
+.zone-sheet { padding: 12px 14px 14px; max-height: 78%; }
+.zone-sheet-head { font-size: 1.15rem; }
+.zone-sheet-head .icon-btn { width: 48px; height: 48px; }
+.verdict-big { display: flex; gap: 12px; align-items: center; margin: 8px 0 10px; padding: 12px 14px; border-radius: 16px; border: 2px solid currentColor; }
+.verdict-big.suitable { color: var(--info); background: var(--info-bg); }
+.verdict-big.unsuitable { color: var(--danger); background: var(--danger-bg); }
+.verdict-big.unknown { color: var(--ink-soft); background: var(--surface-strong); }
+.verdict-mark { flex: none; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; background: currentColor; font-size: 2rem; font-weight: 700; line-height: 1; }
+.verdict-big .verdict-mark { -webkit-text-fill-color: var(--surface-solid); }
+.verdict-title { font-size: 1.35rem; font-weight: 700; line-height: 1.25; }
+.verdict-reason { font-size: 1.05rem; color: var(--ink); }
+.big-btn { font: inherit; font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 58px; padding: 10px 16px; margin-top: 8px; border-radius: 16px; border: 2px solid var(--border-strong); background: var(--surface-strong); color: var(--ink); cursor: pointer; }
+.big-btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.big-btn:disabled { opacity: 0.6; cursor: progress; }
+.marked-line { display: flex; align-items: center; gap: 8px; margin: 4px 0 0; font-size: 1.05rem; font-weight: 600; }
+.more { margin-top: 10px; }
+.more summary { cursor: pointer; font-weight: 600; min-height: 48px; display: flex; align-items: center; color: var(--info); }
+.more .muted { margin: 4px 0; }
+.done-form .field label { font-size: 1.05rem; }

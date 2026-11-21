@@ -1,10 +1,8 @@
 "use client";
 import Link from "next/link";
-import { ChevronDown, LocateFixed, Wind } from "lucide-react";
+import { ChevronDown, LocateFixed } from "lucide-react";
 import { useMemo, useState } from "react";
 import PaiMapLazy from "@/components/map/PaiMapLazy";
-import { compassThai, formatNumber } from "@/lib/format";
-import { PAI_BBOX } from "@/lib/config";
 import { GEO_MESSAGE, useGeolocation } from "@/lib/useGeolocation";
 import { isStale, useApi, useNow } from "@/lib/useApi";
 import { useEnvData } from "@/lib/useEnvData";
@@ -12,7 +10,7 @@ import type { BoundaryData, FarmlandData, ZoneCondition } from "@/lib/types";
 import ZoneSheet from "@/components/ZoneSheet";
 import { BURN_LOG_KEY, EMPTY_LOG, type BurnLog } from "@/lib/burnLog";
 import { useLocalStore } from "@/lib/useLocalStore";
-import { CRITERIA_ARE_SAMPLE, CRITERIA_NOTE } from "@/lib/criteria";
+import { CRITERIA_ARE_SAMPLE } from "@/lib/criteria";
 import { evaluate, VERDICT_TEXT, type Verdict } from "@/lib/evaluate";
 import { STALE_MS } from "@/lib/config";
 import { nearestZone, ZONES, ZONES_ARE_SAMPLE } from "@/lib/zones";
@@ -26,7 +24,6 @@ export default function HomeView() {
   const boundary = useApi<BoundaryData>("/api/boundary");
   const farmland = useApi<FarmlandData>("/api/farmland");
   const geo = useGeolocation();
-  const inPai = geo.pos && geo.pos.lat >= PAI_BBOX.south && geo.pos.lat <= PAI_BBOX.north && geo.pos.lon >= PAI_BBOX.west && geo.pos.lon <= PAI_BBOX.east;
   const [layers, setLayers] = useState({ zones: true, farmland: true, wind: true, hotspots: true });
   const conditions = useApi<ZoneCondition[]>("/api/zone-conditions");
   const now = useNow();
@@ -110,30 +107,18 @@ export default function HomeView() {
             />
           )}
           {!selected && <div className="hero-info glass" role="status" aria-live="polite">
-            {doneNotice && <p><strong>บันทึก {doneNotice} ว่าเผาเสร็จแล้ว</strong> · <Link href="/completed" className="link-btn">ดูรายการเผาเสร็จสิ้น</Link> <button type="button" className="link-btn" onClick={() => setDoneNotice(null)}>ปิด</button></p>}
+            {doneNotice && <p><strong>บันทึก {doneNotice} ว่าเผาเสร็จแล้ว</strong> · <Link href="/completed" className="link-btn">ดูรายการ</Link> <button type="button" className="link-btn" onClick={() => setDoneNotice(null)}>ปิด</button></p>}
             {near && (
-              <p>แปลงที่ใกล้คุณที่สุด: <button type="button" className="link-btn" onClick={() => { setSelectedId(near.zone.id); setFocus({ lat: near.zone.lat, lon: near.zone.lon, seq: Date.now() }); }}>{near.zone.name} ({near.km < 1 ? `${Math.round(near.km * 1000)} ม.` : `${near.km.toFixed(1)} กม.`})</button></p>
-            )}
-            {layers.zones && conditions.result?.status === "ok" && (
-              <p><span className="dot" style={{ background: VERDICT_COLOR.suitable }} />เหมาะสม {counts.suitable} · <span className="dot" style={{ background: VERDICT_COLOR.unsuitable }} />ไม่เหมาะสม {counts.unsuitable} · <span className="dot" style={{ background: VERDICT_COLOR.unknown }} />ตรวจไม่ได้ {counts.unknown}</p>
-            )}
-            {layers.zones && conditions.loading && !conditions.result && <p>กำลังตรวจเงื่อนไขแต่ละจุด…</p>}
-            {layers.zones && (conditions.networkError || conditions.result?.status === "error") && <p>ตรวจเงื่อนไขไม่ได้ <button type="button" className="link-btn" onClick={conditions.refresh}>ลองใหม่</button></p>}
-            {layers.zones && (ZONES_ARE_SAMPLE || CRITERIA_ARE_SAMPLE) && <p>จุดและเกณฑ์เป็นข้อมูลตัวอย่าง {CRITERIA_NOTE}</p>}
-            {geo.status === "ok" && geo.pos && (
-              <p><strong>ตำแหน่งของคุณ</strong> {geo.pos.lat.toFixed(5)}, {geo.pos.lon.toFixed(5)} (± {Math.round(geo.pos.accuracy)} ม.){inPai === false && " · อยู่นอกพื้นที่ต้นแบบอำเภอปาย"}</p>
+              <p>แปลงใกล้คุณ: <button type="button" className="link-btn" onClick={() => { setSelectedId(near.zone.id); setFocus({ lat: near.zone.lat, lon: near.zone.lon, seq: Date.now() }); }}>{near.zone.name} ({near.km < 1 ? `${Math.round(near.km * 1000)} ม.` : `${near.km.toFixed(1)} กม.`})</button></p>
             )}
             {geo.status !== "ok" && geo.status !== "idle" && <p role="alert">{GEO_MESSAGE[geo.status]}</p>}
-            {cur && (
-              <p><Wind size={16} strokeWidth={1.75} aria-hidden="true" style={{ verticalAlign: -3 }} /> ลมจากทิศ{compassThai(cur.windDirection)} {formatNumber(cur.windSpeed, 1)} กม./ชม. <span className="badge model">แบบจำลอง</span></p>
+            {layers.zones && conditions.result?.status === "ok" && (
+              <p className="counts"><span><span className="dot" style={{ background: VERDICT_COLOR.suitable }} />เหมาะสม {counts.suitable}</span><span><span className="dot" style={{ background: VERDICT_COLOR.unsuitable }} />ไม่เหมาะสม {counts.unsuitable}</span><span><span className="dot" style={{ background: VERDICT_COLOR.unknown }} />ตรวจไม่ได้ {counts.unknown}</span></p>
             )}
-            {fl?.status === "ok" && fl.data && (
-              <p>พื้นที่เกษตรจากแผนที่ OSM {fl.data.count} แปลง <strong>(ไม่ครบ และไม่ใช่ทะเบียนแปลงทางการ)</strong></p>
-            )}
-            {farmland.loading && !fl && <p>กำลังโหลดพื้นที่เกษตร…</p>}
-            {(farmland.networkError || fl?.status === "error") && (
-              <p>โหลดพื้นที่เกษตรไม่สำเร็จ <button type="button" className="link-btn" onClick={farmland.refresh}>ลองใหม่</button></p>
-            )}
+            {layers.zones && conditions.loading && !conditions.result && <p>กำลังตรวจสภาพแต่ละจุด…</p>}
+            {layers.zones && (conditions.networkError || conditions.result?.status === "error") && <p>ตรวจสภาพไม่ได้ <button type="button" className="link-btn" onClick={conditions.refresh}>ลองใหม่</button></p>}
+            {(farmland.networkError || fl?.status === "error") && <p>โหลดพื้นที่เกษตรไม่ได้ <button type="button" className="link-btn" onClick={farmland.refresh}>ลองใหม่</button></p>}
+            {layers.zones && (ZONES_ARE_SAMPLE || CRITERIA_ARE_SAMPLE) && <p className="fine">ข้อมูลตัวอย่าง ไม่ใช่การอนุญาตให้เผา</p>}
           </div>}
         </div>
         <a href="#dashboard" className="scroll-cue">เลื่อนลงดูแดชบอร์ด <ChevronDown size={20} strokeWidth={1.75} aria-hidden="true" /></a>
